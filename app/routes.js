@@ -1,38 +1,93 @@
 // Get the Compliment model.
 var Compliment = require('./models/compliment');
 
-    module.exports = function(app) {
+var express = require('express');
 
-        // server routes ===========================================================
-        // handle things like api calls
-        // authentication routes
+module.exports = function(app) {
+    'use strict';
 
-        // sample api route
-        app.get('/api/compliments', function(req, res) {
-            // use mongoose to get all compliments in the database
-            Compliment.find(function(err, compliments) {
+    var api = express.Router();
+    
+    // Middleware to use for all requests.
+    api.use(function(req, res, next) {
+        console.log('Something is happening.');
+        next();
+    });
 
-                // if there is an error retrieving, send the error. 
-                                // nothing after res.send(err) will execute
+    // For routes that end in /compliments.
+    api.route('/compliments')
+
+        // Create a compliment.
+        .post(function(req, res) {
+		
+            var compliment = new Compliment();
+            compliment.author = req.body.author;
+            compliment.body = req.body.body;
+            compliment.date = req.body.date;
+
+            compliment.save(function(err) {
                 if (err)
                     res.send(err);
 
-                res.json(compliments); // return all nerds in JSON format
+                res.json({ message: 'Compliment created!' });
+            });
+        })
+
+        // Get all the compliments.
+        .get(function(req, res) {
+            Compliment.find(function(err, compliments) {
+                if (err)
+                    res.send(err);
+
+                res.json(compliments);
             });
         });
 
-        // route to handle creating goes here (app.post)
-        // route to handle delete goes here (app.delete)
+    // For routes that end in /compliments/:compliment_id.
+    api.route('/compliments/:compliment_id')
 
-        app.get('/test', function(req, res) {
-            res.json({ message: 'YAY it worked!' });
+        // Get the compliment with that id.
+        .get(function(req, res) {
+            Compliment.findById(req.params.compliment_id, function(err, compliment) {
+                if (err)
+                    res.send(err);
+
+                res.json(compliment);
+            });
+        })
+
+        // Update the compliment with this id.
+        .put(function(req, res) {
+            Compliment.findById(req.params.compliment_id, function(err, compliment) {
+
+                if (err)
+                    res.send(err);
+
+                compliment.author = req.body.author;
+                compliment.body = req.body.body;
+                compliment.date = req.body.date;
+
+                compliment.save(function(err) {
+                    if (err)
+                        res.send(err);
+
+                    res.json({ message: 'Compliment updated!' });
+                });
+            });
+        })
+
+        // Delete the compliment with this id.
+        .delete(function(req, res) {
+            Compliment.remove({
+                _id: req.params.compliment_id
+            }, function(err, compliment) {
+                if (err)
+                    res.send(err);
+
+                res.json({ message: 'Successfully deleted' });
+            });
         });
 
-        // frontend routes =========================================================
-        // route to handle all angular requests
-        app.get('*', function(req, res) {
-            res.sendfile('./public/index.html'); // load our public/index.html file
-        });
-
-
-    };
+    // Return this Router instance for the app to use in server.js.
+    return api;
+}();
