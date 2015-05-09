@@ -11,8 +11,6 @@ mongoose.connect(db.url);
 
 var port = process.env.PORT || 8080; 
 
-var Compliment = require('./app/models/compliment');
-
 // Configure body parser.
 app.use(bodyParser.json()); 
 app.use(bodyParser.json({ type: 'application/vnd.api+json' })); 
