@@ -17,17 +17,22 @@ var Compliment = require('./models/compliment');
                 if (err)
                     res.send(err);
 
-                res.json(compliments); // return all compliments in JSON format
+                res.json(compliments); // return all nerds in JSON format
             });
         });
 
         // route to handle creating goes here (app.post)
         // route to handle delete goes here (app.delete)
 
+        app.get('/test', function(req, res) {
+            res.json({ message: 'YAY it worked!' });
+        });
+
         // frontend routes =========================================================
         // route to handle all angular requests
         app.get('*', function(req, res) {
-            res.sendfile('./public/views/index.html'); // load our public/index.html file
+            res.sendfile('./public/index.html'); // load our public/index.html file
         });
+
 
     };
