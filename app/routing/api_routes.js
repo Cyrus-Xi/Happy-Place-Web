@@ -1,5 +1,7 @@
 // Get the Compliment model.
-var Compliment = require('./models/compliment');
+var Compliment = require('../models/compliment');
+// Get the User model.
+var User = require('../models/user');
 
 var express = require('express');
 
@@ -88,6 +90,17 @@ module.exports = function(app) {
             });
         });
 
-    // Return this Router instance for the app to use in server.js.
+    // For routes that end in /users.
+    api.route('/users')
+        // Get all the users.
+        .get(function(req, res) {
+            User.find(function(err, users) {
+                if (err)
+                    res.send(err);
+
+                res.json(users);
+            });
+        });
+
     return api;
 }();
